@@ -120,6 +120,9 @@ UpgradeLog*.htm
 App_Data/*.mdf
 App_Data/*.ldf
 
+#compiled less files
+Content/less/*.css
+
 # =========================
 # Windows detritus
 # =========================
