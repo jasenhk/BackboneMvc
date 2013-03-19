@@ -1,5 +1,8 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Optimization;
+using BundleTransformer.Core.Orderers;
+using BundleTransformer.Core.Transformers;
 
 namespace BackboneMvc
 {
@@ -17,6 +20,11 @@ namespace BackboneMvc
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.unobtrusive*",
                         "~/Scripts/jquery.validate*"));
+
+            bundles.Add(new ScriptBundle("~/bundles/libs").Include(
+                "~/Scripts/bootstrap*",
+                "~/Scripts/underscore.js",  // underscore.js needs to precede backbone.js
+                "~/Scripts/backbone.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
@@ -37,7 +45,33 @@ namespace BackboneMvc
                         "~/Content/themes/base/jquery.ui.tabs.css",
                         "~/Content/themes/base/jquery.ui.datepicker.css",
                         "~/Content/themes/base/jquery.ui.progressbar.css",
+
                         "~/Content/themes/base/jquery.ui.theme.css"));
+            
+            //BundleTable.Bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap*"));
+            //BundleTable.Bundles.Add(new StyleBundle("~/Content/bootstrap").Include("~/Content/bootstrap.css", "~/Content/bootstrap-responsive.css"));
+
+            var lessBundle = new Bundle("~/bundles/style/site")
+                //.Include("~/Content/less/import/*.less")
+                .Include("~/Content/less/bootstrap.less")
+                .Include("~/Content/less/variables.less")
+                .Include("~/Content/less/mixins.less")
+                .Include("~/Content/less/_core.less")
+                .Include("~/Content/less/Site.less")
+                .Include("~/Content/*.css");
+
+            lessBundle.Transforms.Add(new CssTransformer());
+            //lessBundle.Transforms.Add(new CssMinify());
+            bundles.Add(lessBundle);
+        }
+
+        public class LessTransform : IBundleTransform
+        {
+            public void Process(BundleContext context, BundleResponse response)
+            {
+                response.Content = dotless.Core.Less.Parse(response.Content);
+                response.ContentType = "text/css";
+            }
         }
     }
 }
